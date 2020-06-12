@@ -1,0 +1,310 @@
+
+<html>
+  <head>
+  <meta charset="utf-8">
+  <title>zero2solv</title>
+  <!-- Latest compiled and minified CSS -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" crossorigin="anonymous">
+  <!-- Latest compiled and minified JavaScript -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js" crossorigin="anonymous"></script>
+  <script src="storage-gist.js"></script>
+  <style>
+    #main table {
+      margin: 3px;
+      border-collapse: separate;
+      border-spacing: 1px 3px;
+    }
+    /*
+    td.inbl {
+      background-color: lightgray;
+    }
+    */
+    .diff1 {
+      background-color: #5cb85c80;
+      fill: #5cb85c;
+    }
+    .diff2 {
+      background-color: #f0ad4e80;
+      fill: #f0ad4e;
+    }
+    .diff3 {
+      background-color: #d9534f80;
+      fill: #d9534f;
+    }
+    td.inbl.ac {
+      opacity: 0.3;
+    }
+    rect.imbl.ac {
+      fill: white;
+    }
+    td.inbl.selected {
+      border: 5px solid red;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+    /*
+    rect.imbl {
+      fill: lightgray;
+    }
+    rect.imbl.ac {
+      fill: springgreen;
+    }
+    */
+  </style>
+  </head>
+  <body>
+    <base target="_blank">
+    <div id="coverPage" style="width:100%; height:100%">
+        <div style="width:100%; height:10%">
+              <div id="pasteHint">登入leetcode後，開啟下列網址並將內容全選複製，在最下方文字框內貼上</div>
+              <div><a href="http://leetcode.com/api/problems/algorithms/" target="_blank">https://leetcode.com/api/problems/algorithms/</a></div>
+        </div>
+  
+        <div style="width:100%; height:80%">
+            <textarea id="parseSrc" style="width:100%; height:100%" placeholder="paste here"></textarea>
+            <!-- <div id="sandbox" style="width: 100%; height: 20%; overflow: scroll"></div> -->
+        </div>
+        <pre id="dbg">
+        </pre>
+    </div>
+  
+    <script>
+      /*
+      function handlePaste (e) {
+        var clipboardData, pastedData;
+  
+        // Stop data actually being pasted into div
+        e.stopPropagation();
+        e.preventDefault();
+  
+        // Get pasted data via clipboard API
+        clipboardData = e.clipboardData || window.clipboardData;
+        //console.log(clipboardData.getData('text/html'));
+        pastedData = clipboardData.getData('Text/Html');
+  
+        // Do whatever with pasteddata
+        e.target.value = pastedData;
+        
+        parseHtml(pastedData);
+      }
+      */
+
+      function handleChange(e) {
+        var str = e.target.value;
+        try {
+          $('#coverPage').css('opacity', '0.5');
+          setTimeout(function() {
+            data = JSON.parse(str);
+            parseData(data);
+          }, 100);
+        } catch (e) {
+          $('#coverPage').css('opacity', '1');
+          data = null;
+        }
+      }
+  
+      document.getElementById('parseSrc').addEventListener('change', handleChange);
+    </script>
+      
+    <script>
+      function parseData(data) {
+        /*
+        ac_easy: 0  ac_hard: 0  ac_medium: 0  category_slug: "all"  frequency_high: 0   frequency_mid: 0 
+        num_solved: 0​  num_total: 1474 user_name: ""
+        */
+        probs = parseProbs(data.stat_status_pairs);
+        delete data.stat_status_pairs;
+
+        $('#nameLabel').html('account: <a href="https://leetcode.com/'+data.user_name+'/">'+data.user_name+'</a>');
+        draw(probs);
+          
+
+/*
+        dbgStr = "";
+        dbgStr += JSON.stringify(data)+"\n";
+
+
+        for (var pid in probs) {
+          var prob = probs[pid];
+          /*
+          difficulty: Object { level: 1 }
+          ​frequency: 0
+          ​is_favor: false
+          ​paid_only: true
+          ​progress: 0
+          ​stat:
+            ​​frontend_question_id: 1469
+            ​​is_new_question: false
+            ​​question__article__live: null
+            ​​question__article__slug: null
+            ​​question__hide: false
+            ​​question__title: "Find All The Lonely Nodes"
+            ​​question__title_slug: "find-all-the-lonely-nodes"
+            ​​question_id: 1609
+            ​​total_acs: 2048
+            ​​total_submitted: 2417
+            ​​<prototype>: Object { … }
+          ​status: null       | ac
+          * /
+          if (prob.paid_only) continue;
+          dbgStr += prob.status + "| (" + prob.difficulty.level + ") " + prob.stat.frontend_question_id + ". " + prob.stat.question__title + " (" + prob.stat.total_acs + "/" + prob.stat.total_submitted + ")" +"\n";
+        }
+
+        document.getElementById("dbg").innerHTML = dbgStr;
+        */
+      }
+
+
+      
+    </script>
+    
+      <script>
+      function parseProbs(data) {
+        var probs = [];
+        for (var pid in data) {
+          var prob = data[pid];
+          /*
+          difficulty: Object { level: 1 }
+          ​frequency: 0
+          ​is_favor: false
+          ​paid_only: true
+          ​progress: 0
+          ​stat:
+            ​​frontend_question_id: 1469
+            ​​is_new_question: false
+            ​​question__article__live: null
+            ​​question__article__slug: null
+            ​​question__hide: false
+            ​​question__title: "Find All The Lonely Nodes"
+            ​​question__title_slug: "find-all-the-lonely-nodes"
+            ​​question_id: 1609
+            ​​total_acs: 2048
+            ​​total_submitted: 2417
+            ​​<prototype>: Object { … }
+          ​status: null       | ac
+          */
+          if (prob.paid_only) continue;
+          probs.push({pid: prob.stat.frontend_question_id,
+                      title: prob.stat.question__title,
+                      slug: prob.stat.question__title_slug,
+                      difficulty: prob.difficulty.level,
+                      ac: prob.status=="ac"?true:false,
+                      total_acs: prob.stat.total_acs,
+                      total_submitted: prob.stat.total_submitted
+                      });
+        }
+
+        probs.sort((a, b) => (a.total_acs/a.total_submitted < b.total_acs/b.total_submitted) ? 1 : -1);
+        return probs;
+      }
+      
+          
+      function SVG(tag, attrs) {
+          var el = document.createElementNS('http://www.w3.org/2000/svg', tag);
+          for (var k in attrs)
+              el.setAttribute(k, attrs[k]);
+          return el;
+      }
+      
+      probDict = {};
+      function draw(probs) {
+          $('#coverPage').hide();
+          $('#main').show();
+          
+          var pageW=10, pageH=10;
+          var table, row, img;
+          var row;
+          for (var i=0; i<probs.length; i++) {
+              var pageI=Math.floor(i/(pageW*pageH)), pageZ=i%(pageW*pageH);
+              var pageX=pageZ%pageW, pageY=Math.floor(pageZ/pageW);
+              //console.log(pageX, pageY);
+              if (pageZ==0) {
+                  table = $('<table>');
+                  img = $('<svg width="45" height="30">');
+              }
+              if (pageX==0) {
+                  row = $('<tr>');
+              }
+  
+              prob = probs[i];
+              var cell = $('<td>').attr('id', 'p'+prob['pid']).addClass('inbl');
+              cell.append($('<a>').html(prob['pid'] + '<br>' + prob['title']).attr('href', 'https://leetcode.com/problems/'+prob['slug']));
+              var hiddenInfo = (prob['total_acs']/prob['total_submitted']*100).toFixed(1)+"%="+prob['total_acs']+"/"+prob['total_submitted'];
+              cell.attr('title', hiddenInfo);
+              //if (prob['difficulty']==0)
+              cell.addClass('diff'+prob['difficulty']);
+              if (prob['ac']) cell.addClass('ac');
+              row.append(cell);
+              probDict[prob['pid']] = 'tab'+pageI;
+              
+              var classStr = 'imbl';
+              classStr += ' diff'+prob['difficulty'];
+              if (prob['ac']) classStr += ' ac';
+              var rect = SVG('rect', {width:3, height:3, x:(pageX*3), y:(pageY*3), class:classStr});            
+              img.append(rect);
+              
+              if (pageX==pageW-1) {
+                  table.append(row);
+              }
+              if (pageZ==(pageW*pageH-1)) {
+                  var tab = $('<div>').attr('id', 'tab'+pageI).addClass('tab-pane fade');
+                  if (pageI==0) tab.addClass('in active');
+                  $('#contents').append(tab.append(table));
+                  var li = $('<li>');
+                  if (pageI==0) li.addClass('active');
+                  var a = $('<a data-toggle="tab">').attr('href', '#tab'+pageI);
+                  $('ul#tabs').append(li.append(a.append(img)));
+              }
+          }
+      }
+  
+      $(function() {
+        $('#showPid').click(function(e) {
+          var pid=$('#pidTxt').val();
+          $('a[data-toggle=tab][href=#'+probDict[pid]+']').click();
+          $('td.inbl').removeClass('selected');
+          $('#p'+pid).addClass('selected');
+          console.log(probDict[pid]);
+        });
+        $('#pidTxt').keypress(function(e){
+          if (e.which==13) {
+            $('#showPid').click();
+          }
+        });
+      });
+      </script>
+  
+    <div id="main" style="display: none">
+        <div>
+        <div id="title" style="float:left;margin-right:20px"><a href="?">leet to solve</a> <br/> <span id="nameLabel"></span></div>
+        <ul class="nav nav-pills" id="tabs" style="display: inline-block">
+        </ul>
+        <div id="rightCol" style="float:right">
+          <!--<div id="msg"></div>-->
+          <div class="input-group">
+            <span class="input-group-addon">pid:</span>
+            <input type="text" id="pidTxt" class="form-control" placeholder="a001">
+            <span class="input-group-btn"><button type="button" class="btn btn-default" id="showPid">show</button></span>
+          </div>
+        </div>
+        </div>
+        <div class="tab-content" id="contents" style="clear:both">
+        </div>
+    </div>
+    
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+  
+    ga('create', 'UA-50207952-4', 'auto');
+    ga('send', 'pageview', {
+      'page': location.pathname + location.search  + location.hash
+    });
+  
+  </script>
+  </body>
+  </html>
+  
