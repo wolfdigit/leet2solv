@@ -1,4 +1,3 @@
-
 <html>
   <head>
   <meta charset="utf-8">
@@ -117,6 +116,12 @@
         delete data.stat_status_pairs;
 
         $('#nameLabel').html('account: <a href="https://leetcode.com/'+data.user_name+'/">'+data.user_name+'</a>');
+        $('#nHard').html('+'+data.ac_hard);
+        $('#nMed').html('+'+data.ac_medium);
+        $('#nEasy').html('+'+data.ac_easy);
+        $('#aHard').html(data.ac_hard);
+        $('#aMed').html(data.ac_hard+data.ac_medium);
+        $('#aEasy').html(data.ac_hard+data.ac_medium+data.ac_easy);
         draw(probs);
           
 
@@ -277,7 +282,25 @@
   
     <div id="main" style="display: none">
         <div>
-        <div id="title" style="float:left;margin-right:20px"><a href="?">leet to solve</a> <br/> <span id="nameLabel"></span></div>
+        <div id="title" style="float:left;margin-right:20px">
+          <div style="display: table-cell;">
+            <a href="?">leet to solve</a> <br/> 
+            <span id="nameLabel"></span>
+          </div>
+          <div style="display: table-cell;">
+            <table>
+              <colgroup>
+                <col class="diff3">
+                <col class="diff2">
+                <col class="diff1">
+              </colgroup>
+              <tr style="font-size:0.9em; line-height: 0.9em;"><th>H</th><th>M</th><th>E</th></tr>
+              <tr style="font-size:0.9em; line-height: 0.9em;"><td id="nHard">+0</td><td id="nMed">+0</td><td id="nEasy">+0</td></tr>
+              <tr><td id="aHard">0</td><td id="aMed">0</td><td id="aEasy">0</td></tr>
+            </table>
+          </div>
+        </div>
+        
         <ul class="nav nav-pills" id="tabs" style="display: inline-block">
         </ul>
         <div id="rightCol" style="float:right">
@@ -306,5 +329,4 @@
   
   </script>
   </body>
-  </html>
-  
+</html>
